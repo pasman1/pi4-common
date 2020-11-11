@@ -30,47 +30,35 @@ errexit()
   exit 1
 }
 
+
 ckfs()
 {
   sync
   sleep .25
-  e2fsck -f -n "$1"
-  if [ $? -ne 0 ]; then
-    errexit "Filesystem appears corrupted $2"
-  fi
+  e2fsck -f -n "$1" || errexit "Filesystem appears corrupted $2"
 }
+
 
 mntpart()
 {
   MNTED=TRUE
   if [ ! -d "${MNTPATH}/" ]; then
-    mkdir "${MNTPATH}/"
-    if [ $? -ne 0 ]; then
-      errexit "Unable to make partition mount point"
-    fi
+    mkdir "${MNTPATH}/" || errexit "Unable to make partition mount point"
   fi
-  mount "$1" "${MNTPATH}/"
-  if [ $? -ne 0 ]; then
-    errexit "Unable to mount $1"
-  fi
+  mount "$1" "${MNTPATH}/" || errexit "Unable to mount $1"
 }
+
 
 umntpart()
 {
-  umount "${MNTPATH}/"
-  if [ $? -ne 0 ]; then
-    errexit "Unable to unmount partition"
-  fi
+  umount "${MNTPATH}/" || errexit "Unable to unmount partition"
   rm -rf "${MNTPATH}/"
   MNTED=FALSE
 }
 
 mkloop()
 {
-  LOOP="$(losetup -f --show -P "${IMGFILE}")"
-  if [ $? -ne 0 ]; then
-    errexit "Unable to create loop device"
-  fi
+  LOOP="$(losetup -f --show -P "${IMGFILE}")" || errexit "Unable to create loop device"
 }
 
 rmloop()
@@ -86,37 +74,19 @@ mntimg()
   MNTED=TRUE
   mkloop
   if [ ! -d "${MNTPATH}/" ]; then
-    mkdir "${MNTPATH}/"
-    if [ $? -ne 0 ]; then
-      errexit "Unable to make ROOT partition mount point"
-    fi
+    mkdir "${MNTPATH}/" || errexit "Unable to make ROOT partition mount point"
   fi
-  mount "${LOOP}p2" "${MNTPATH}/"
-  if [ $? -ne 0 ]; then
-    errexit "Unable to mount image ROOT partition"
-  fi
+  mount "${LOOP}p2" "${MNTPATH}/" || errexit "Unable to mount image ROOT partition"
   if [ ! -d "${MNTPATH}/boot/" ]; then
-    mkdir -p "${MNTPATH}/boot/"
-    if [ $? -ne 0 ]; then
-      errexit "Unable to make BOOT partition mount point"
-    fi
+    mkdir -p "${MNTPATH}/boot/" || errexit "Unable to make BOOT partition mount point"
   fi
-  mount "${LOOP}p1" "${MNTPATH}/boot/"
-  if [ $? -ne 0 ]; then
-    errexit "Unable to mount image BOOT partition"
-  fi
+  mount "${LOOP}p1" "${MNTPATH}/boot/" || errexit "Unable to mount image BOOT partition"
 }
 
 umntimg()
 {
-  umount "${MNTPATH}/boot/"
-  if [ $? -ne 0 ]; then
-    errexit "Unable to unmount image BOOT partition"
-  fi
-  umount "${MNTPATH}/"
-  if [ $? -ne 0 ]; then
-    errexit "Unable to unmount image ROOT partition"
-  fi
+  umount "${MNTPATH}/boot/"  || errexit "Unable to unmount image BOOT partition"
+  umount "${MNTPATH}/"  || errexit "Unable to unmount image ROOT partition"
   rmloop
   rm -rf "${MNTPATH}/"
   MNTED=FALSE
