@@ -1,4 +1,4 @@
-# pi-common
+# pi4-common
 
 
-There are some scripts for raspberry pi - all versions
+There are some scripts for raspberry pi 4.
