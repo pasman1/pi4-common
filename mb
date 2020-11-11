@@ -266,13 +266,13 @@ outkmgt()
   VALUE="$1"
   ((VALUE *= 512))
   if [ ${VALUE} -ge ${ONETB} ]; then
-    printf "%.1fT" "$(bc <<< "scale=3 ; ${VALUE} / ${ONETB}")"
+    bc <<< "scale=3 ; print ${VALUE} / ${ONETB} , \"T\""
   elif [ ${VALUE} -ge ${ONEGB} ]; then
-    printf "%.1fG" "$(bc <<< "scale=3 ; ${VALUE} / ${ONEGB}")"
+    bc <<< "scale=3 ; print ${VALUE} / ${ONEGB} , \"G\""
   elif [ ${VALUE} -ge ${ONEMB} ]; then
-    printf "%.1fM" "$(bc <<< "scale=3 ; ${VALUE} / ${ONEMB}")"
+    bc <<< "scale=3 ; print ${VALUE} / ${ONEMB} , \"M\""
   elif [ ${VALUE} -ge ${ONEKB} ]; then
-    printf "%.1fK" "$(bc <<< "scale=3 ; ${VALUE} / ${ONEKB}")"
+    bc <<< "scale=3 ; print ${VALUE} / ${ONEKB} , \"K\""
   else
     printf "%d" "${VALUE}"
   fi
