@@ -14,7 +14,7 @@ MNTPATH="/tmp/multiboot-mnt"
 ONEKB=$((1024))
 ONEMB=$((1024 * 1024))
 ONEGB=$((1024 * 1024 * 1024))
-ONETB=$((1024 * 1024 * 1024 *1024))
+ONETB=$((1024 * 1024 * 1024 * 1024))
 
 errexit()
 {
@@ -1061,38 +1061,16 @@ else
     if [[ $? -ne 0 || "${ACTION}" = "" ]]; then
       break
     fi
+    
     case "${ACTION}" in
-      INSERT)
-        insert
-        ;;
-
-      REMOVE)
-        remove
-        ;;
-
-      RESIZE)
-        resize
-        ;;
-
-      LOCATE)
-        locate
-        ;;
-
-      RENAME)
-        rename
-        ;;
-
-      SELECT)
-        select_
-        ;;
-
-      MBRGPT)
-        mbrgpt
-        ;;
-
-      INITIALIZE)
-        initialize
-        ;;
+      INSERT) insert ;;
+      REMOVE) remove ;;
+      RESIZE) resize ;;
+      LOCATE) locate ;;
+      RENAME) rename ;;
+      SELECT) select_ ;;
+      MBRGPT) mbrgpt ;;
+      INITIALIZE) initialize ;;
     esac
   done
 fi
