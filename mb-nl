@@ -231,9 +231,8 @@ inpkmgt()
 
 outkmgt()
 {
-  local VALUE
+  local VALUE="$1"
 
-  VALUE="$1"
   ((VALUE *= 512))
   if [ ${VALUE} -ge ${ONETB} ]; then
     bc <<< "scale=3 ; print ${VALUE} / ${ONETB} , \"T\""
@@ -254,22 +253,20 @@ init()
   local j
   local DEVICES
 
-  bc --version &> /dev/null
-  if [ $? -eq 127 ]; then
+  bc --version &> /dev/null || {
     echo ""
     echo "Installing bc"
     echo ""
     apt-get update
     apt-get install bc
-  fi
-  gdisk -l /dev/null &> /dev/null
-  if [ $? -eq 127 ]; then
+  }
+  gdisk -l /dev/null &> /dev/null || {
     echo ""
     echo "Installing gdisk"
     echo ""
     apt-get update
     apt-get install gdisk
-  fi
+  }
   echo "Scanning ${DEVICE}"
   DISK_END=$(blockdev --getsz "${DEVICE}")
   PTTYPE="$(blkid "${DEVICE}" | sed -n 's|^.*PTTYPE="\(\S\+\)".*|\1|p')"
