@@ -1,0 +1,25 @@
+#!/bin/bash
+
+git clone --depth=1 --branch 5.10.y https://github.com/raspberrypi/linux || exit
+
+sudo apt install git bc bison flex libssl-dev make libc6-dev libncurses5-dev
+
+#RPi4-32bit
+sudo apt install crossbuild-essential-armhf
+cd linux && {
+  KERNEL=kernel7l
+  make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- bcm2711_defconfig
+  make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- zImage modules dtbs
+}
+
+
+
+exit
+
+#RPi4-64bit
+sudo apt install crossbuild-essential-arm64
+cd linux && {
+  KERNEL=kernel8
+  make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- bcm2711_defconfig
+  make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- Image modules dtbs
+}
