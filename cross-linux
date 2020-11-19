@@ -1,25 +1,58 @@
 #!/bin/bash
 
-git clone --depth=1 --branch 5.10.y https://github.com/raspberrypi/linux || exit
+echo "======================================"
+echo "RPi Kernel bilder"
+echo "======================================"
 
-sudo apt install git bc bison flex libssl-dev make libc6-dev libncurses5-dev
-
-#RPi4-32bit
-sudo apt install crossbuild-essential-armhf
-cd linux && {
-  KERNEL=kernel7l
-  make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- bcm2711_defconfig
-  make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- zImage modules dtbs
+test -d linux || { 
+  echo "Select kernel:"
+  select BRANCH in rpi-5.4.y rpi-5.9.y rpi-5.10.y; do 
+    git clone --depth=1 --branch $BRANCH https://github.com/raspberrypi/linux || exit
+    break
+  done
 }
 
+TARCH="armhf"
+echo "Target architecture: $TARCH"
+
+BOARD="Pi4"
+echo "Target board: $BOARD"
 
 
-exit
+sudo apt install -y git bc bison flex libssl-dev make libc6-dev libncurses5-dev || exit
+sudo apt install -y crossbuild-essential-$TARCH 
 
-#RPi4-64bit
-sudo apt install crossbuild-essential-arm64
-cd linux && {
-  KERNEL=kernel8
-  make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- bcm2711_defconfig
-  make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- Image modules dtbs
-}
+cd linux || exit
+make clean
+
+case "$BOARD-$TARCH" in 
+
+  Pi0-armhf)
+      KERNEL=kernel
+      make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- bcmrpi_defconfig
+      make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- menuconfig
+      make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- -j2 zImage modules dtbs
+  ;;
+
+  Pi2-armhf)
+      KERNEL=kernel7
+      make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- bcm2709_defconfig
+      make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- menuconfig
+      make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- -j2 zImage modules dtbs
+  ;;
+
+  Pi4-armhf)
+      KERNEL=kernel7l
+      make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- bcm2711_defconfig
+      make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- menuconfig
+      make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- -j3 zImage modules dtbs
+  ;;
+
+  Pi4-arm64)
+      KERNEL=kernel8
+      make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- bcm2711_defconfig
+      make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- menuconfig
+      make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -j2 Image modules dtbs
+  ;;
+
+esac
